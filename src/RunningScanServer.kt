@@ -19,8 +19,10 @@ class RunningScanServer(private val messageQueue: LinkedBlockingQueue<String>, t
 
         server.addListener(object : Listener() {
             override fun received(clientSocket: Connection?, payload: Any?) {
-                val message = payload as String
-                messageQueue.add(message)
+                if (payload !is String)
+                    return
+
+                messageQueue.add(payload)
             }
         })
     }
