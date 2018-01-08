@@ -1,4 +1,4 @@
-import com.esotericsoftware.kryonet.Client
+import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 
 
@@ -13,26 +13,17 @@ import java.util.concurrent.LinkedBlockingQueue
  * the blocking queue and then makes the input through the virtual number pad
  *
  */
-
 fun main(args: Array<String>) {
+
     val blockingQueue = LinkedBlockingQueue<String>()
     val tcpPort = 60111
-    val localhost = "127.0.0.1"
-    val runningScanServer = RunningScanServer(blockingQueue, tcpPort)
+    val udpPort = 51213
+
+    val runningScanServer = RunningScanServer(blockingQueue, tcpPort, Optional.of(udpPort))
     val barcodeTyper = BarcodeTyper(blockingQueue)
 
     barcodeTyper.start()
-    println("Press any key to send message")
-    readLine()
-
-    val client = Client()
-    client.start()
-    client.connect(5000, localhost, tcpPort)
-
-    val request = "3211332"
-    client.sendTCP(request)
-
-    println("Press any key to exit")
+    println("Running..., Press any key to exit")
     readLine()
 
     barcodeTyper.stop()
