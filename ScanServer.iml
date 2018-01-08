@@ -18,5 +18,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="VirtualNumpad" level="project" />
+    <orderEntry type="library" name="kryonet" level="project" />
   </component>
 </module>
