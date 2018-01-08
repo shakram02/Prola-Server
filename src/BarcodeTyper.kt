@@ -1,12 +1,11 @@
 import VirtualNumpad.lib.VirtualNumpad
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Logger
 
 class BarcodeTyper(private val messageQueue: LinkedBlockingQueue<String>) {
-    private val willContinue = AtomicBoolean(true)
     private val virtualNumpad = VirtualNumpad()
     private val typerThread = Thread({ run() })
+    private val logger = Logger.getLogger(this.javaClass.simpleName)
 
     fun start() {
         typerThread.isDaemon = true
@@ -14,17 +13,15 @@ class BarcodeTyper(private val messageQueue: LinkedBlockingQueue<String>) {
     }
 
     private fun run() {
-        while (willContinue.get()) {
+        while (!typerThread.isInterrupted) {
             try {
 
-                val message: String? = messageQueue.poll(1, TimeUnit.SECONDS)
-
-                // Waited and the queue is empty
-                if (message.isNullOrEmpty()) {
-                    continue
-                }
+                val message: String? = messageQueue.take()
 
                 virtualNumpad.type(message)
+                virtualNumpad.pressEnter()
+                logger.info("Entered:" + message)
+
             } catch (e: InterruptedException) {
                 println("Ok, time to leave")
                 return
@@ -33,7 +30,6 @@ class BarcodeTyper(private val messageQueue: LinkedBlockingQueue<String>) {
     }
 
     fun stop() {
-        willContinue.set(false)
-        typerThread.join()
+        typerThread.interrupt()
     }
 }
